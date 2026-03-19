@@ -54,4 +54,6 @@ decP x p
     | x < p = [x]
     | otherwise = decP (div x p) p ++ [mod x p]
 
+pDec :: (Foldable t, Integral b) => t b -> b -> b
 pDec ls p = foldl(\hatvany x ->  x + (p ^ hatvany)) 0 ls
+
