@@ -1,59 +1,172 @@
-myLength [] = 0
-myLength (x:xs) = 1 + myLength xs
+import Data.List
+import Data.Ord
 
+--  Definiáljuk azt a Haskell-listát, amely tartalmazza:
 
-myLength2 ls = foldr (\x db -> (+) 1 db) 0 ls
+-- az első n páros szám négyzetét,
+printLs ls = mapM_ (\e -> putStr (show e ++ " ")) ls
 
-myLength3 ls = length ls
+parosNegyzet n = [i * i | i <- [0 .. n], even i]
 
-myProduct [] = 1
-myProduct (x : xs) = x * myProduct xs
+parosNegyzet2 n = take n [i * i | i <- [0, 2 ..]]
 
-myProduct2 [] res = res 
-myProduct2 (x : xs) res = myProduct2 xs (res*x)
+parosNegyzet3 n = take n [(i, i * i) | i <- [0, 2 ..]]
 
-myProduct3 ls = foldr (*) 1 ls
+parosNegyzet4 n = mapM_ print res
+  where
+    res = [(i, i ** 2) | i <- [0, 2 .. n]]
 
-myMinimum [] = error "ures lista"
-myMinimum [x] = x
-myMinimum (x1 :x2 :xs)
-    | x1 < x2 = myMinimum (x1 :xs)
-    | otherwise = myMinimum (x2 :xs)
+parosNegyzet5 n = mapM_ myPrint res
+  where
+    res = [(i, i ** 2) | i <- [0, 2 .. n]]
+    myPrint (szam, negyzet) = putStrLn (show szam ++ " negyzete " ++ show negyzet)
 
-myMinimum2 ls = foldl1 min ls 
+-- az első [1, 2, 2, 3, 3, 3, 4, 4, 4, 4,...],
+szamokLs n = take n $ szamok 1
+  where
+    szamok i = aux i ++ szamok (i + 1)
+    aux i = replicate i i
 
-myMinimum3 ls = minimum ls
+szamokLs2 n i
+  | i /= n = replicate i i ++ szamokLs2 n (i + 1)
+  | otherwise = replicate i i
 
-listaN ls n 
-    | ls == [] = error "ures listi"
-    | n < 0 = error "neg, index"
-    | length ls <= n = error "tul nagy index"
-    | otherwise = ls !! n
+-- az első [2, 4, 4, 6, 6, 6, 8, 8, 8, 8...],
+szamokLs3 n i
+  | i /= n = replicate i (2 * i) ++ szamokLs3 n (i + 1)
+  | otherwise = replicate i (2 * i)
 
-palindrom ls = ls == reverse ls
+-- az első [n, n-1, ... 2, 1, 1, 2, ..., n-1, n],
+szamokLs4 n = reverse [1 .. n] ++ [1 .. n]
 
-palindrom2 ls = if ls == reverse ls then "palindrom" else "nem palindrom"
+szamokLs5 n = [n, n - 1 .. 1] ++ [1 .. n]
 
-palindrom3 [] = True
-palindrom3 [x] = True
-palindrom3 ls = head ls == last ls && palindrom3 ((init . tail) ls) -- levagja az elso s utolso elemet a listabol
+-- váltakozva tartalmazzon True és False értékeket,
+trueFalseLs n = take n lista
+  where
+    lista = [True, False] ++ lista
 
+-- váltakozva tartalmazza a 0, 1, -1 értékeket.
+szamokLs6 n = take n ls
+  where
+    ls = [0, 1, -1] ++ ls
 
+-- II. Könyvtárfüggvények használata nélkül írjuk meg azt a Haskell függvényt, amely
 
-szjls x
-    | x < 0 = szjls (abs x)
-    | x < 10 = [x]
-    | otherwise = szjls (div x 10) ++ [mod x 10]
+-- meghatározza egy adott szám osztóinak számát,
+osztok x = [i | i <- [1 .. x], mod x i == 0]
 
-elsoUtolso ls = tail ls ++ [head ls]
+osztokSz x = length (osztok x)
 
-elsoUtolso2 (x:xs) = xs ++ [x]
+osztokSz2 x = foldr (\_ db -> 1 + db) 0 (osztok x)
 
+osztokSz3 x = myLength (osztok x)
+  where
+    myLength [] = 0
+    myLength (x : xs) = 1 + myLength xs
 
-decP x p 
-    | x < p = [x]
-    | otherwise = decP (div x p) p ++ [mod x p]
+-- meghatározza egy adott szám legnagyobb páratlan osztóját,
+maxParatlanOszto x = last $ filter odd $ osztok x
 
-pDec :: (Foldable t, Integral b) => t b -> b -> b
-pDec ls p = foldl(\hatvany x ->  x + (p ^ hatvany)) 0 ls
+maxParatlanOszto2 x = maximum $ filter odd $ osztok x
 
+-- meghatározza, hogy egy tízes számrendszerbeli szám p számrendszerben, hány számjegyet tartalmaz,
+decToP x p
+  | x < p = [x]
+  | otherwise = decToP (div x p) p ++ [mod x p]
+
+decToPSzj x p = length (decToP x p)
+
+-- meghatározza, hogy egy tízes számrendszerbeli szám p számrendszerbeli alakjában melyik a legnagyobb számjegy,
+decToPMax x p = maximum $ decToP x p
+
+-- meghatározza az a és b közötti Fibonacci számokat, a > 50 .
+fiboN n = fibo 0 1 0 n
+  where
+    fibo _ _ res 0 = res
+    fibo n1 n2 res n = fibo n2 res (res + n2) (n - 1)
+
+fiboN2 n = fibo n 0 1
+  where
+    fibo 0 a b = [a]
+    fibo n a b = a : fibo (n - 1) b (a + b)
+
+fiboN3 n = take n (fibo 0 1)
+  where
+    fibo a b = a : fibo b (a + b)
+
+fibo = fiboS 0 1 0
+  where
+    fiboS a b res = res : fiboS b res (b + res)
+
+fiboAB a b = dropWhile (< a) $ takeWhile (< b) (fibo)
+
+-- III. Könyvtárfüggvények használata nélkül írjuk meg azt a Haskell függvényt, amely
+-- meghatározza egy lista pozitív elemeinek átlagát,
+lsPozAtlag ls = sum ls1 / fromIntegral (length ls1)
+  where
+    ls1 = filter (> 0) ls
+
+lsPozAtlag2 ls = osszeg / db
+  where
+    osszeg = sum [i | i <- ls, i > 0]
+    db = fromIntegral (length ls)
+
+-- meghatározzuk azt a listát, amely tartalmazza az eredeti lista minden n-ik elemét,
+lsN ls n =
+  case drop (n - 1) ls of
+    (k : ve) -> k : lsN ve n
+    [] -> []
+
+lsN2 ls n = [snd i | i <- zip [1 ..] ls, mod (fst i) n == 0]
+
+-- tükrözi egy lista elemeit,
+tukroz [] = []
+tukroz (x : xs) = tukroz xs ++ [x]
+
+tukroz2 ls = reverse ls
+
+-- két módszerrel is meghatározza egy lista legnagyobb elemeinek pozícióit: a lista elemeit kétszer járja be, illetve úgy hogy a lista elemeit csak egyszer járja be,
+maxElemI ls = ids
+  where
+    maxElem = maximum ls
+    ids = [i | (i, elem) <- zip [1 ..] ls, elem == maxElem]
+
+maxElemI2 ls =
+  let maxElem = maximum ls
+      ids = [i | (i, elem) <- zip [1 ..] ls, elem == maxElem]
+   in ids
+
+maxElemI3 [] = []
+maxElemI3 (x : xs) = reverse positions
+  where
+    (_, positions) = foldl update (x, [0]) (zip xs [1 ..])
+    update (currentMax, positions) (elem, idx)
+      | elem > currentMax = (elem, [idx])
+      | elem == currentMax = (currentMax, idx : positions)
+      | otherwise = (currentMax, positions)
+
+maxElemI4 ls = getMaxi 1 maxElem ls []
+  where
+    maxElem = maximum ls
+    getMaxi _ _ [] res = res
+    getMaxi i maxe (k : ve) res
+      | k == maxe = getMaxi (i + 1) maxe ve (res ++ [i])
+      | otherwise = getMaxi (i + 1) maxe ve res
+
+-- meghatározza egy lista leggyakrabban előforduló elemét.
+leggyakoribb [] = []
+leggyakoribb ls = k : leggyakoribb ve
+  where
+    k = (kurrens, length [e | e <- ls, e == kurrens])
+    ve = [e | e <- ls, e /= kurrens]
+    kurrens = head ls
+
+leggyakoribb2 [] = error "ures lista"
+leggyakoribb2 ls = head $ maximumBy (comparing length) $ group $ sort ls
+
+leggyakoribb3 ls = head lgyE
+  where
+    elof = leggyakoribb ls
+    lgyE = sortOn (Down . snd) elof
+  
