@@ -16,6 +16,7 @@ szamokLs2 n i
   | i /= n = replicate i i ++ szamokLs2 n (i + 1)
   | otherwise = replicate i i
 
+
 -- - az első $$[2, 4, 4, 6, 6, 6, 8, 8, 8, 8\ldots]$$,
 szamokLs3 n i
   | i /= n = replicate i (i * 2) ++ szamokLs3 n (i + 1)

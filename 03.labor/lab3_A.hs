@@ -15,6 +15,14 @@ atlag ls = (sum ls) / fromIntegral (length ls)
 -- II. Könyvtárfüggvények használata nélkül írjuk meg azt a Haskell függvényt, amely
 
 -- - meghatározza egy lista elemszámát, 2 módszerrel (myLength),
+
+
+sumfoldr ls = foldr (+) 0 ls 
+reverse_with_foldr ls = foldr (\elso masodik -> masodik++[elso]) [] ls
+
+evenfilter_foldr ls = foldr (\x tobbi -> if even x then x : tobbi else tobbi) [] ls
+  
+
 myLength [] = 0
 myLength (x : xs) = 1 + myLength xs
 
@@ -22,7 +30,9 @@ myLength (x : xs) = 1 + myLength xs
 myLength2 [] res = res
 myLength2 (x : xs) res = myLength2 xs (res + 1)
 
-myLength3 ls = foldr (\x db -> (+) 1 db) 0 ls
+
+listInc1 ls = map (\x -> x + 1) ls
+myLength3 ls = foldr ( \x db -> (+) 1 db) 0 ls
 
 myLength4 ls = foldl (\db x -> (+) 1 db) 0 ls
 
@@ -51,6 +61,15 @@ myMinimum [x] = x
 myMinimum (x1 : x2 : xs)
   | x1 < x2 = myMinimum (x1 : xs)
   | otherwise = myMinimum (x2 : xs)
+
+
+
+myMaximumMM [] = error "ures"
+myMaximumMM [x] = x
+myMaximumMM (x1:x2:xs) 
+  | x1 < x2 = myMaximumMM (x2:xs)
+  | otherwise = myMaximumMM (x1:xs)
+
 
 myMinimum2 [] = error "ures lista"
 myMinimum2 [x] = x
@@ -82,6 +101,10 @@ listaN2 ls n
   | n < 0 = error "neg. index"
   | length ls <= n = error "tul nagy index"
   | otherwise = ls !! n
+
+
+matrix_atlo mtrx = map (\x -> (listaN mtrx x) !! x ) [0..length mtrx - 1]
+
 
 listaNMap ls = map (\x -> listaN x 0) ls
 
@@ -128,6 +151,8 @@ decP x p
 -- - meghatározza egy p számrendszerben megadott szám számjegyei alapján a megfelelő 10-es számrendszerbeli számot.
 pDec ls p = foldl (\hatvany x -> x + (p ** hatvany)) 0 ls
 
+
+--2 
 pDec2 x p =
   let szamjegyek x
         | x < 10 = [x]
@@ -137,7 +162,8 @@ pDec2 x p =
 
 -- III. Alkalmazzuk a map függvényt a II.-nél megírt függvényekre.
 
--- IV. Írjunk egy Haskell függvényt, amely meghatározza a $$P(x) = a_0 + a_1 x + a_2 x^2 + \ldots + a_n x^n$$ polinom adott $x_0$ értékre való behelyettesítési értékét.
+-- IV. Írjunk egy Haskell függvényt, amely meghatározza a
+-- $$P(x) = a_0 + a_1 x + a_2 x^2 + \ldots + a_n x^n$$ polinom adott $x_0$ értékre való behelyettesítési értékét.
 aLs = [3, -2, 5, -7]
 
 x0 = 2
@@ -145,7 +171,8 @@ x0 = 2
 poli [] x = 0
 poli (a : aLs) x = a + x * (poli aLs x)
 
--- V. Ha adva van egy P pont koordinátája a kétdimenziós síkban, és adott az lsP pontok egy listája, írjunk egy Haskell függvényt, amely meghatározza azt az lsP-beli P1 pontot, amely legközelebb van a P ponthoz.
+-- V. Ha adva van egy P pont koordinátája a kétdimenziós síkban, és adott az lsP pontok egy listája, írjunk egy Haskell függvényt, 
+--amely meghatározza azt az lsP-beli P1 pontot, amely legközelebb van a P ponthoz.
 type Pont = (Double, Double)
 
 lsP :: [Pont]

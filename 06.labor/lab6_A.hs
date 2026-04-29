@@ -49,7 +49,7 @@ main2 = do
   putStr "n="
   n <- readLn :: IO Int
   putStrLn ("n=" ++ show n)
-  let fiboLs = fibo n
+  let fiboLs = [1..n]
   putStrLn "mapM_-el"
   mapM_ (\x -> putStr (show x ++ " ")) fiboLs
   putStrLn "\nunwords-el"
